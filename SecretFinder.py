@@ -8,7 +8,7 @@ import os,sys
 if not sys.version_info.major >= 3:
     print("[ + ] Run this tool with python version 3.+")
     sys.exit(0)
-os.environ["BROWSER"] = "open"
+# os.environ["BROWSER"] = "open"
 
 import re
 import glob
@@ -35,11 +35,17 @@ from urllib.parse import urlparse
 
 # regex 
 _regex = {
-    'google_api'     : r'AIza[0-9A-Za-z-_]{35}',
+    
+    'google_cloud_api_key'     : r'AIza[0-9A-Za-z-_]{35}',
     'firebase'  : r'AAAA[A-Za-z0-9_-]{7}:[A-Za-z0-9_-]{140}',
     'google_captcha' : r'6L[0-9A-Za-z-_]{38}|^6[0-9a-zA-Z_-]{39}$',
+    'GCP_Key' : r"(?i)(google|gcp|youtube|drive|yt)(.{0,20})?['\"][AIza[0\-9a\-z\\\-_]{35}]['\"]",
     'google_oauth'   : r'ya29\.[0-9A-Za-z\-_]+',
+    'GOOGLE_OAUTH_ID' : r'[0-9]+-[0-9A-Za-z_]{32}\.apps\.googleusercontent\.com/',
     'amazon_aws_access_key_id' : r'AKIA[0-9A-Z]{16}',
+    'AMAZON_ACCESS_KEY' : r'AK[0-9A-Z]{18}',
+    'AWS_access_key_ID_value' : r"([^A-Z0-9]|^)(AKIA|A3T|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{12,}",
+    'AWS access key ID value' : r"(A3T[A-Z0-9]|AKIA|AGPA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}",
     'amazon_mws_auth_toke' : r'amzn\\.mws\\.[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}',
     'amazon_aws_url' : r's3\.amazonaws.com[/]+|[a-zA-Z0-9_-]*\.s3\.amazonaws.com',
     'amazon_aws_url2' : r"(" \
@@ -48,28 +54,57 @@ _regex = {
            r"|s3-[a-zA-Z0-9-\.\_\/]+" \
            r"|s3.amazonaws.com/[a-zA-Z0-9-\.\_]+" \
            r"|s3.console.aws.amazon.com/s3/buckets/[a-zA-Z0-9-\.\_]+)",
+    'ATOMIST_API_KEY' : r'\b[A-F0-9]{64}\b/',
+    'Accengage Partner ID and Private Key' : r'\"acc_private_key\"\>[0\-9a\-f]{40}',
+    'FCM server key' : r"AAAA[a-zA-Z0-9_-]{7}:[a-zA-Z0-9_-]{140}",
     'facebook_access_token' : r'EAACEdEose0cBA[0-9A-Za-z]+',
+    'facebook_oauth' : r"[f|F][a|A][c|C][e|E][b|B][o|O][o|O][k|K].{0,30}['\"\s][0-9a-f]{32}['\"\s]",
     'authorization_basic' : r'basic [a-zA-Z0-9=:_\+\/-]{5,100}',
     'authorization_bearer' : r'bearer [a-zA-Z0-9_\-\.=:_\+\/]{5,100}',
     'authorization_api' : r'api[key|_key|\s+]+[a-zA-Z0-9_\-]{5,100}',
+    'Branch SDK Key' : r'key_live_[0\-9A\-Za\-z\-_\-]{32}',
+    'Branch Secret Key' : r'secret_live_[0\-9A\-Za\-z\-_\-]{32}',
+    'Cloudinary API Key/Secret Pair' : r'cloudinary://[0\-9]{15}:[0\-9A\-Za\-z\-_\-]{27}',
+    'Linkedin_Secret_Key' : r"(?i)linkedin(.{0,20})?['\"][0\-9a\-z]{16}['\"]",
+    'Microsoft Azure Tenant Client Secret' : r'[0\-9A\-Za\-z\+\=]{40\,50}',
+    'MAILCHIMP_API_KEY' : r'[0-9a-f]{32}-us[0-9]{1,2}',
     'mailgun_api_key' : r'key-[0-9a-zA-Z]{32}',
+    'Mapbox Secret Access Token' : r'sk.ey[0\-9A\-Za\-z\-_.\-]{81}',
+    'Nuget_api' : r'oy2[a-z0-9]{43}',
+    'New_Relic' : r'[0\-9a\-f]{36}NRAL',
+    'Outlook_team' : r'(https\\://outlook\\.office.com/webhook/[0-9a-f-]{36}\\@)',
+    'Possible-Juicy-Files' : r"(aws_access|aws_secret|api[_-]?key|ListBucketResult|S3_ACCESS_KEY|Authorization:|RSA PRIVATE|Index of|aws_|secret|ssh-rsa AA)",
+    'Private_Key' : r'([-]+BEGIN [^\\s]+ PRIVATE KEY[-]+[\\s]*[^-]*[-]+END [^\\s]+ PRIVATE KEY[-]+)',
     'twilio_api_key' : r'SK[0-9a-fA-F]{32}',
     'twilio_account_sid' : r'AC[a-zA-Z0-9_\-]{32}',
     'twilio_app_sid' : r'AP[a-zA-Z0-9_\-]{32}',
+    'Twitter_ACCESS_TOKEN' : r"twitter.*[1-9][0-9]+-[0-9a-zA-Z]{40}",
+    'TWITTER_ACCESS_TOKEN' : r'[1-9][0-9]+-[0-9a-zA-Z]{40}',
+    'Twitter_secret_key' : r"(?i)twitter(.{0,20})?['\"][0\-9a\-z]{35\,44}",
+    'twitter_oauth' : r"[t|T][w|W][i|I][t|T][t|T][e|E][r|R].{0,30}['\"\s][0-9a-zA-Z]{35,44}['\"\s]",
+    'Username:Password' : r'\b((?:ht|f|sm)tps?:\/\/)[^:/?#\[\]@""<>{}|\\^``\s]+:[^:/?#\[\]@""<>{}|\\^``\s]+@',
     'paypal_braintree_access_token' : r'access_token\$production\$[0-9a-z]{16}\$[0-9a-f]{32}',
     'square_oauth_secret' : r'sq0csp-[ 0-9A-Za-z\-_]{43}|sq0[a-z]{3}-[0-9A-Za-z\-_]{22,43}',
     'square_access_token' : r'sqOatp-[0-9A-Za-z\-_]{22}|EAAA[a-zA-Z0-9]{60}',
     'stripe_standard_api' : r'sk_live_[0-9a-zA-Z]{24}',
     'stripe_restricted_api' : r'rk_live_[0-9a-zA-Z]{24}',
+    'stripe_token' : r'(?:r|s)k_[live|test]_[0-9a-zA-Z]{24}',
     'github_access_token' : r'[a-zA-Z0-9_-]*:[a-zA-Z0-9_\-]+@github\.com*',
+    'GITHUB_TOKEN' : r'(https?:\/\/)(?:v1\.)?[a-f0-9]{40}((?::x-oauth-basic)?@)',
     'rsa_private_key' : r'-----BEGIN RSA PRIVATE KEY-----',
     'ssh_dsa_private_key' : r'-----BEGIN DSA PRIVATE KEY-----',
     'ssh_dc_private_key' : r'-----BEGIN EC PRIVATE KEY-----',
     'pgp_private_block' : r'-----BEGIN PGP PRIVATE KEY BLOCK-----',
     'json_web_token' : r'ey[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$',
     'slack_token' : r"\"api_token\":\"(xox[a-zA-Z]-[a-zA-Z0-9-]+)\"",
+    'slack_token' : r'(xox[p|b|o|a]-[0-9]{12}-[0-9]{12}-[0-9]{12}-[a-z0-9]{32})',
+    'slack access token Bot' : r"xoxb-[0-9A-Za-z\\-]{51}",
+    'slack access token Person' : r"xoxp-[0-9A-Za-z\\-]{72}",
+    'slack_webhook' : r'https://hooks.slack.com/services/T[a-zA-Z0-9_]{8}/B[a-zA-Z0-9_]{8}/[a-zA-Z0-9_]{24}',
     'SSH_privKey' : r"([-]+BEGIN [^\s]+ PRIVATE KEY[-]+[\s]*[^-]*[-]+END [^\s]+ PRIVATE KEY[-]+)",
-    'Heroku API KEY' : r'[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}',
+    'URL_PASSWORD' : r'((?:ht|f|sm)tps?:\/\/[^:/?#\[\]@""<>{}|\\^``\s]+:)[^:/?#\[\]@""<>{}|\\^``\s]+@',
+    'Heroku_API_KEY' : r'[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}',
+    'heroku_api' : r'[h|H][e|E][r|R][o|O][k|K][u|U].{0,30}[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}',
     'possible_Creds' : r"(?i)(" \
                     r"password\s*[`=:\"]+\s*[^\s]+|" \
                     r"password is\s*[`=:\"]*\s*[^\s]+|" \

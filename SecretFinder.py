@@ -43,8 +43,6 @@ _regex = {
     'google_oauth'   : r'ya29\.[0-9A-Za-z\-_]+',
     'GOOGLE_OAUTH_ID' : r'[0-9]+-[0-9A-Za-z_]{32}\.apps\.googleusercontent\.com/',
     'amazon_aws_access_key_id' : r'AKIA[0-9A-Z]{16}',
-    'AMAZON_ACCESS_KEY' : r'AK[0-9A-Z]{18}',
-    'AWS_access_key_ID_value' : r"([^A-Z0-9]|^)(AKIA|A3T|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{12,}",
     'AWS access key ID value' : r"(A3T[A-Z0-9]|AKIA|AGPA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}",
     'amazon_mws_auth_toke' : r'amzn\\.mws\\.[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}',
     'amazon_aws_url' : r's3\.amazonaws.com[/]+|[a-zA-Z0-9_-]*\.s3\.amazonaws.com',
@@ -106,7 +104,6 @@ _regex = {
     'slack_webhook' : r'https://hooks.slack.com/services/T[a-zA-Z0-9_]{8}/B[a-zA-Z0-9_]{8}/[a-zA-Z0-9_]{24}',
     'SSH_privKey' : r"([-]+BEGIN [^\s]+ PRIVATE KEY[-]+[\s]*[^-]*[-]+END [^\s]+ PRIVATE KEY[-]+)",
     'URL_PASSWORD' : r'((?:ht|f|sm)tps?:\/\/[^:/?#\[\]@""<>{}|\\^``\s]+:)[^:/?#\[\]@""<>{}|\\^``\s]+@',
-    'Heroku_API_KEY' : r'[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}',
     'heroku_api' : r'[h|H][e|E][r|R][o|O][k|K][u|U].{0,30}[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}',
     'possible_Creds' : r"(?i)(" \
                     r"password\s*[`=:\"]+\s*[^\s]+|" \
